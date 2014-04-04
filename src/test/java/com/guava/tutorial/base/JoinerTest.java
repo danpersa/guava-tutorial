@@ -20,4 +20,20 @@ public class JoinerTest {
             .join("abc", null, 123), //
             is("abc-123"));
     }
+
+    @Test
+    public void joinWithoutGuavaExample() {
+        Object[] parts = {"abc", null, 123};
+        StringBuilder join = new StringBuilder();
+        for (Object part : parts) {
+            if (part != null) {
+                join.append(part);
+                if (!part.equals(parts[parts.length - 1])) {
+                    join.append("-");
+                }
+            }
+        }
+
+        assertThat(join.toString(), is("abc-123"));
+    }
 }
