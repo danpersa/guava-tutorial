@@ -13,6 +13,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
@@ -20,24 +21,12 @@ import com.google.common.collect.Lists;
  */
 public class FluentIterableTest {
 
-    @Test
-    public void fluentIterableExample() {
-
-        List<Integer> numbers =                                    //
-            Lists.newArrayList(1, -1, 3, null, -3, null, 5);
-        ImmutableList<String> strings =
-            FluentIterable.from(numbers)                           //
-                          .filter(Predicates.notNull())            //
-                          .filter(new Predicate<Integer>() {
-                                  public boolean apply(final Integer number) {
-                                      return number > 0;
-                                  }
-                              })                                   //
-                          .transform(Functions.toStringFunction()) //
-                          .limit(10)                               //
-                          .toList();
-        assertThat(strings, is(ImmutableList.of("1", "3", "5")));
-    }
+    private static final Predicate<Integer> GREATER_THAN_ZERO_PREDICATE = //
+        new Predicate<Integer>() {
+            public boolean apply(final Integer number) {
+                return number > 0;
+            }
+        };
 
     @Test
     public void collectionTransformationWithoutGuavaExample() {
@@ -56,8 +45,60 @@ public class FluentIterableTest {
             strings.add(number.toString());
         }
 
-        assertThat(ImmutableList.copyOf(strings), //
-            is(ImmutableList.of("1", "3", "5")));
+        final List<String> limit = strings.subList(0, 2);
+
+        assertThat(ImmutableList.copyOf(limit), //
+            is(ImmutableList.of("1", "3")));
     }
 
+    @Test
+    public void iterableExample() {
+        List<Integer> numbers = //
+            Lists.newArrayList(1, -1, 3, null, -3, null, 5);
+
+        final Iterable<Integer> notNull = //
+            Iterables.filter(numbers, Predicates.notNull());
+
+        final Iterable<Integer> greaterThanZero = //
+            Iterables.filter(notNull, GREATER_THAN_ZERO_PREDICATE);
+
+        final Iterable<String> strings = //
+            Iterables.transform(greaterThanZero, Functions.toStringFunction());
+
+        final Iterable<String> limit = Iterables.limit(strings, 2);
+
+        assertThat(ImmutableList.copyOf(limit), //
+            is(ImmutableList.of("1", "3")));
+    }
+
+    @Test
+    public void iterableInlinedExample() {
+        List<Integer> numbers = //
+            Lists.newArrayList(1, -1, 3, null, -3, null, 5);
+
+        final Iterable<String> strings = Iterables.transform(        //
+                Iterables.filter(                                    //
+                    Iterables.filter(numbers, Predicates.notNull()), //
+                    GREATER_THAN_ZERO_PREDICATE),                    //
+                Functions.toStringFunction());
+
+        assertThat(ImmutableList.copyOf(Iterables.limit(strings, 2)), //
+            is(ImmutableList.of("1", "3")));
+
+    }
+
+    @Test
+    public void fluentIterableExample() {
+
+        List<Integer> numbers =                                    //
+            Lists.newArrayList(1, -1, 3, null, -3, null, 5);
+        ImmutableList<String> strings =
+            FluentIterable.from(numbers)                           //
+                          .filter(Predicates.notNull())            //
+                          .filter(GREATER_THAN_ZERO_PREDICATE)     //
+                          .transform(Functions.toStringFunction()) //
+                          .limit(2)                                //
+                          .toList();
+        assertThat(strings, is(ImmutableList.of("1", "3")));
+    }
 }

@@ -39,7 +39,8 @@ public class SplittersTest {
                 }
             }
         } else {
-            throw new IllegalArgumentException("String " + sequence + " does not contain -");
+            throw new IllegalArgumentException( //
+                "String " + sequence + " does not contain -");
         }
 
         assertThat(splitList, hasItems("abc", "123"));
