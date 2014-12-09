@@ -33,6 +33,7 @@ public class CharMatcherTest {
         CharMatcher.is('x');
         CharMatcher.isNot('_');
         CharMatcher.anyOf("aeiou");
+        CharMatcher.anyOf("aeiou").precomputed();
         CharMatcher.inRange('a', 'z')                 //
                    .or(CharMatcher.inRange('A', 'Z')) //
                    .negate();

@@ -17,8 +17,8 @@ public class NullSafePoint implements Point {
     }
 
     private NullSafePoint(@Nonnull final Integer x, @Nonnull final Integer y) {
-        this.x = Preconditions.checkNotNull(x);
-        this.y = Preconditions.checkNotNull(y);
+        this.x = Preconditions.checkNotNull(x, "x should not be null");
+        this.y = Preconditions.checkNotNull(y, "y should not be null");
     }
 
     @Nonnull
